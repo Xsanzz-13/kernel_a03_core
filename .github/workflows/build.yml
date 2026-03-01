@@ -1,0 +1,41 @@
+name: Build Kernel A03 Core
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Install Toolchain & Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev clang lld llvm
+          # Download GCC 4.9 (Cross-compiler wajib)
+          git clone --depth 1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 gcc64
+          # Download Clang r383902
+          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r383902.tar.gz
+          mkdir clang && tar -xf clang-r383902.tar.gz -C clang
+
+      - name: Build Kernel
+        run: |
+          export PATH=$(pwd)/clang/bin:$(pwd)/gcc64/bin:$PATH
+          export ARCH=arm64
+          export CROSS_COMPILE=aarch64-linux-android-
+          export CLANG_TRIPLE=aarch64-linux-gnu-
+          export BSP_BUILD_FAMILY=sharkl3
+          export BSP_BUILD_ANDROID_OS=y
+          
+          # 1. Konfigurasi
+          make O=out CC=clang LD=ld.lld a3core_eur_open_defconfig
+          
+          # 2. Compile
+          make -j$(nproc --all) O=out CC=clang LD=ld.lld BSP_BUILD_DT_OVERLAY=y
+
+      - name: Upload Kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kernel-A03Core-Image
+          path: out/arch/arm64/boot/Image
