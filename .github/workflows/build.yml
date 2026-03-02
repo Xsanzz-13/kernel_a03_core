@@ -19,7 +19,7 @@ jobs:
           
           # 2. Download Clang (Pake Link "Ori" crDroid pilihan lu)
           git clone --depth=1 https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-6443078 clang
-
+          
       - name: Build Kernel
         run: |
           # Setup PATH biar sistem tau di mana letak toolchain-nya
@@ -32,7 +32,7 @@ jobs:
           export CLANG_TRIPLE=aarch64-linux-gnu-
           
           # Informasi builder (opsional tapi bagus buat identitas kernel)
-          export KBUILD_BUILD_USER=Xsanzz
+          export KBUILD_BUILD_USER=Xsans
           export KBUILD_BUILD_HOST=@Memek
 
           # 1. Bersihkan sisa-sisa gagal tadi
@@ -54,6 +54,12 @@ jobs:
             OBJDUMP=llvm-objdump \
             STRIP=llvm-strip \
             BSP_BUILD_DT_OVERLAY=y
+
+      - name: Upload Kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kernel-A03Core-Image
+          path: out/arch/arm64/boot/Image
 
       - name: Upload Kernel
         uses: actions/upload-artifact@v4
