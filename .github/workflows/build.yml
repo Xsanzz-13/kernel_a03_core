@@ -15,10 +15,10 @@ jobs:
           sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev wget
           # Download GCC 4.9
           git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 gcc64
-          # DOWNLOAD CLANG PAKE WGET (Cara paling aman dari Error 400/Bad Request)
+          # PAKE MIRROR CLANG (Anti Google Git Error)
           mkdir clang
-          wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r383902.tar.gz
-          tar -xf clang-r383902.tar.gz -C clang
+          wget -q https://github.com/ZyCromerZ/Clang/releases/download/10.0.9-20200513-binutils-2.34/Clang-10.0.9-20200513-binutils-2.34.tar.gz
+          tar -xf Clang-10.0.9-20200513-binutils-2.34.tar.gz -C clang
 
       - name: Build Kernel
         run: |
