@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -12,50 +12,46 @@ jobs:
       - name: Install Toolchain & Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev
+          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev \
+          libncurses5 libncurses5-dev lib32z1 libc6-i386 python2
           
-          # Download GCC & Clang (Link crDroid pilihan lu yang udah terbukti lancar)
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 gcc64
           git clone --depth=1 https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-6443078 clang
 
       - name: Build Kernel
         run: |
-          # JALUR PASTI: Kita pakai Path Absolut biar gak nyasar
-          WORKING_DIR=$(pwd)
-          CLANG_BIN=$WORKING_DIR/clang/bin
-          GCC_BIN=$WORKING_DIR/gcc64/bin
+          # DISINI GUE GAK ASUMSI LAGI: Cari file aslinya ada di folder mana
+          GCC_BIN=$(find $(pwd)/gcc64 -name "aarch64-linux-android-gcc" -type f -exec dirname {} + | head -n 1)
+          CLANG_BIN=$(find $(pwd)/clang -name "clang" -type f -exec dirname {} + | head -n 1)
           
-          # Tambahkan ke PATH sistem
+          # Masukkan hasil temuan ke PATH
           export PATH=$CLANG_BIN:$GCC_BIN:$PATH
           
-          # Variabel Lingkungan
+          # Cek di log biar lu liat sendiri bener apa nggak lokasinya
+          echo "LOKASI GCC: $GCC_BIN"
+          echo "LOKASI CLANG: $CLANG_BIN"
+          
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-android-
           export CLANG_TRIPLE=aarch64-linux-gnu-
-          
-          # Hapus sisa-sisa gagal
+
           make O=out clean
           make O=out mrproper
 
-          # 1. Konfigurasi
+          # Konfigurasi
           make O=out CC=clang CROSS_COMPILE=aarch64-linux-android- a3core_eur_open_defconfig
 
-          # 2. PROSES COMPILE (Gue tambahin argumen buat bypass error stack-protector)
+          # Compile (Bypass stack protector biar gak rewel)
           make -j$(nproc --all) O=out \
             CC=clang \
             CROSS_COMPILE=aarch64-linux-android- \
             CLANG_TRIPLE=aarch64-linux-gnu- \
             LD=ld.lld \
-            AR=llvm-ar \
-            NM=llvm-nm \
-            OBJCOPY=llvm-objcopy \
-            OBJDUMP=llvm-objdump \
-            STRIP=llvm-strip \
-            CONFIG_CC_STACKPROTECTOR_STRONG=y \
+            CONFIG_CC_STACKPROTECTOR_STRONG=n \
             BSP_BUILD_DT_OVERLAY=y
 
       - name: Upload Kernel
         uses: actions/upload-artifact@v4
         with:
-          name: Kernel-A03Core-Image
+          name: Kernel-Image
           path: out/arch/arm64/boot/Image
