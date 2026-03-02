@@ -14,52 +14,46 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev
           
-          # 1. Download GCC 4.9
+          # 1. Download GCC 4.9 (Asisten wajib buat Kernel Samsung lama)
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 gcc64
           
-          # 2. Download Clang 
+          # 2. Download Clang (Pake Link "Ori" crDroid pilihan lu)
           git clone --depth=1 https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-6443078 clang
 
       - name: Build Kernel
         run: |
-          # 1. Setup Path
+          # Setup PATH biar sistem tau di mana letak toolchain-nya
           export PATH=$(pwd)/clang/bin:$(pwd)/gcc64/bin:$PATH
           
-          # 2. Setup Variables (Disesuaikan dengan Toolchain mvaisakh)
+          # Variabel wajib buat arsitektur 64-bit
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
           export CLANG_TRIPLE=aarch64-linux-gnu-
           
-          # Tambahan biar Clang tau di mana folder GCC-nya
-          export KBUILD_BUILD_USER=Xsans
-          export KBUILD_BUILD_HOST=GithubActions
+          # Informasi builder (opsional tapi bagus buat identitas kernel)
+          export KBUILD_BUILD_USER=Xsanzz
+          export KBUILD_BUILD_HOST=@Memek
 
-          # 3. Bersihkan sisa gagal tadi
+          # 1. Bersihkan sisa-sisa gagal tadi
           make O=out clean
           make O=out mrproper
 
-          # 4. Konfigurasi
+          # 2. Konfigurasi (Pake defconfig A03 Core lu)
           make O=out CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- a3core_eur_open_defconfig
 
-          # 5. Compile (Pake semua "senjata" LLVM biar gak rewel)
+          # 3. Proses Compile (Hajar pake semua core CPU)
           make -j$(nproc --all) O=out \
             CC=clang \
+            CLANG_TRIPLE=aarch64-linux-gnu- \
+            CROSS_COMPILE=aarch64-linux-gnu- \
             LD=ld.lld \
             AR=llvm-ar \
             NM=llvm-nm \
             OBJCOPY=llvm-objcopy \
             OBJDUMP=llvm-objdump \
             STRIP=llvm-strip \
-            CLANG_TRIPLE=aarch64-linux-gnu- \
-            CROSS_COMPILE=aarch64-linux-gnu- \
             BSP_BUILD_DT_OVERLAY=y
-
-          # 1. Konfigurasi
-          make O=out CC=clang LD=ld.lld a3core_eur_open_defconfig
-
-          # 2. Compile
-          make -j$(nproc --all) O=out CC=clang LD=ld.lld BSP_BUILD_DT_OVERLAY=y
 
       - name: Upload Kernel
         uses: actions/upload-artifact@v4
