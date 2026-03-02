@@ -14,10 +14,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev wget
           
-          # DOWNLOAD GCC 4.9 (Pake Mirror GitHub LineageOS - Anti Blokir)
-          git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 gcc64
+          # MIRROR GCC 4.9 (Dari GitHub, bukan Google)
+          git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 gcc64
           
-          # DOWNLOAD CLANG (Pake Mirror ZyCromerZ - Anti Blokir)
+          # MIRROR CLANG (Dari GitHub)
           mkdir clang
           wget -q https://github.com/ZyCromerZ/Clang/releases/download/10.0.9-20200513-binutils-2.34/Clang-10.0.9-20200513-binutils-2.34.tar.gz
           tar -xf Clang-10.0.9-20200513-binutils-2.34.tar.gz -C clang
@@ -26,10 +26,9 @@ jobs:
         run: |
           export PATH=$(pwd)/clang/bin:$(pwd)/gcc64/bin:$PATH
           export ARCH=arm64
-          export CROSS_COMPILE=aarch64-linux-android-
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
           export CLANG_TRIPLE=aarch64-linux-gnu-
-          export BSP_BUILD_FAMILY=sharkl3
-          export BSP_BUILD_ANDROID_OS=y
 
           # 1. Konfigurasi
           make O=out CC=clang LD=ld.lld a3core_eur_open_defconfig
