@@ -12,23 +12,22 @@ jobs:
       - name: Install Toolchain & Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev wget
+          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev
           
-          # MIRROR GCC 4.9 (Dari GitHub, bukan Google)
+          # 1. Download GCC 4.9 (Link yang tadi SUKSES di log lu)
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 gcc64
           
-          # MIRROR CLANG (Dari GitHub)
-          mkdir clang
-          wget -q https://github.com/ZyCromerZ/Clang/releases/download/10.0.9-20200513-binutils-2.34/Clang-10.0.9-20200513-binutils-2.34.tar.gz
-          tar -xf Clang-10.0.9-20200513-binutils-2.34.tar.gz -C clang
+          # 2. Download Clang r383902 (Pake Mirror LineageOS - 1000% Lebih Stabil)
+          git clone --depth=1 https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86_clang-r383902 clang
 
       - name: Build Kernel
         run: |
           export PATH=$(pwd)/clang/bin:$(pwd)/gcc64/bin:$PATH
           export ARCH=arm64
-          export CROSS_COMPILE=aarch64-linux-gnu-
-          export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+          export CROSS_COMPILE=aarch64-linux-android-
           export CLANG_TRIPLE=aarch64-linux-gnu-
+          export BSP_BUILD_FAMILY=sharkl3
+          export BSP_BUILD_ANDROID_OS=y
 
           # 1. Konfigurasi
           make O=out CC=clang LD=ld.lld a3core_eur_open_defconfig
