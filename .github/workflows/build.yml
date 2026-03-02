@@ -14,14 +14,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev
           
-          # 1. Download GCC 4.9 (Link yang tadi SUKSES di log lu)
+          # 1. Download GCC 4.9
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 gcc64
           
-          # 2. Download Clang r383902 (Pake Mirror LineageOS - 1000% Lebih Stabil)
-          git clone --depth=1 https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86_clang-r383902 clang
+          # 2. Download Clang 
+          git clone --depth=1 https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-6443078 clang
 
       - name: Build Kernel
         run: |
+          # Atur PATH ke folder bin toolchain yang baru didownload
           export PATH=$(pwd)/clang/bin:$(pwd)/gcc64/bin:$PATH
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-android-
