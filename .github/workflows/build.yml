@@ -12,11 +12,13 @@ jobs:
       - name: Install Toolchain & Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev
-          # Download GCC 4.9 (Wajib buat kernel lama)
+          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev wget
+          # Download GCC 4.9
           git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 gcc64
-          # Download Clang r383902 (Pake git clone biar anti Error 400)
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/clang-r383902 clang
+          # DOWNLOAD CLANG PAKE WGET (Cara paling aman dari Error 400/Bad Request)
+          mkdir clang
+          wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r383902.tar.gz
+          tar -xf clang-r383902.tar.gz -C clang
 
       - name: Build Kernel
         run: |
