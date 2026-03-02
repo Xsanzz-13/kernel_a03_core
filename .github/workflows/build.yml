@@ -13,9 +13,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev wget
-          # Download GCC 4.9
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 gcc64
-          # PAKE MIRROR CLANG (Anti Google Git Error)
+          
+          # DOWNLOAD GCC 4.9 (Pake Mirror GitHub LineageOS - Anti Blokir)
+          git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 gcc64
+          
+          # DOWNLOAD CLANG (Pake Mirror ZyCromerZ - Anti Blokir)
           mkdir clang
           wget -q https://github.com/ZyCromerZ/Clang/releases/download/10.0.9-20200513-binutils-2.34/Clang-10.0.9-20200513-binutils-2.34.tar.gz
           tar -xf Clang-10.0.9-20200513-binutils-2.34.tar.gz -C clang
