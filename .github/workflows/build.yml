@@ -12,12 +12,11 @@ jobs:
       - name: Install Toolchain & Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev clang lld llvm
-          # Download GCC 4.9 (Cross-compiler wajib)
-          git clone --depth 1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 gcc64
-          # Download Clang r383902
-          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r383902.tar.gz
-          mkdir clang && tar -xf clang-r383902.tar.gz -C clang
+          sudo apt-get install -y bc build-essential bison flex libssl-dev libelf-dev
+          # Download GCC 4.9 (Wajib buat kernel lama)
+          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 gcc64
+          # Download Clang r383902 (Pake git clone biar anti Error 400)
+          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/clang-r383902 clang
 
       - name: Build Kernel
         run: |
@@ -27,10 +26,10 @@ jobs:
           export CLANG_TRIPLE=aarch64-linux-gnu-
           export BSP_BUILD_FAMILY=sharkl3
           export BSP_BUILD_ANDROID_OS=y
-          
+
           # 1. Konfigurasi
           make O=out CC=clang LD=ld.lld a3core_eur_open_defconfig
-          
+
           # 2. Compile
           make -j$(nproc --all) O=out CC=clang LD=ld.lld BSP_BUILD_DT_OVERLAY=y
 
